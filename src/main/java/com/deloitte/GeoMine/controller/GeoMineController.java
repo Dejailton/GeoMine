@@ -1,6 +1,7 @@
 package com.deloitte.GeoMine.controller;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,11 +12,8 @@ import com.deloitte.GeoMine.service.GeoMineService;
 @RequestMapping("/minas")
 public class GeoMineController {
 
-    private final GeoMineService service;
-
-    public GeoMineController(GeoMineService service) {
-        this.service = service;
-    }
+    @Autowired
+    private GeoMineService service;
 
     @GetMapping
     public List<GeoMineModel> listar() {

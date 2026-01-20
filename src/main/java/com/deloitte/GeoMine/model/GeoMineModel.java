@@ -2,6 +2,9 @@ package com.deloitte.GeoMine.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import com.deloitte.GeoMine.model.ProducaoModel;
+
+import java.util.List;
 
 @Entity
 @Table(name= "geo_mine_model")
@@ -19,6 +22,10 @@ public class GeoMineModel {
 
     @NotNull
     private String mineral;
+
+
+    @OneToMany(mappedBy = "geoMineModel", cascade = CascadeType.ALL)
+    private List<ProducaoModel> producoes;
 
     private boolean ativa;
 

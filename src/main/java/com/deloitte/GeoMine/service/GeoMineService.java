@@ -2,6 +2,7 @@ package com.deloitte.GeoMine.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.deloitte.GeoMine.model.GeoMineModel;
@@ -10,11 +11,8 @@ import com.deloitte.GeoMine.repository.GeoMineRepository;
 @Service
 public class GeoMineService {
 
-    private final GeoMineRepository repository;
-
-    public GeoMineService(GeoMineRepository repository) {
-        this.repository = repository;
-    }
+    @Autowired
+    private GeoMineRepository repository;
 
     public List<GeoMineModel> listarTodas() {
         return repository.findAll();
