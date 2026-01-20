@@ -1,6 +1,7 @@
 package com.deloitte.GeoMine.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name= "geo_mine_model")
@@ -10,19 +11,25 @@ public class GeoMineModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     private String nome;
+
+    @NotNull
     private String localizacao;
+
+    @NotNull
     private String mineral;
-    private String status;
+
+    private boolean ativa;
 
     public GeoMineModel() {
     }
 
-    public GeoMineModel(String nome, String localizacao, String mineral, String status) {
+    public GeoMineModel(String nome, String localizacao, String mineral, boolean ativa) {
         this.nome = nome;
         this.localizacao = localizacao;
         this.mineral = mineral;
-        this.status = status;
+        this.ativa = ativa;
     }
 
     public Long getId() {
@@ -53,11 +60,11 @@ public class GeoMineModel {
         this.mineral = mineral;
     }
 
-    public String getStatus() {
-        return status;
+    public boolean isAtiva() {
+        return ativa;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setAtiva(boolean ativa) {
+        this.ativa = ativa;
     }
 }

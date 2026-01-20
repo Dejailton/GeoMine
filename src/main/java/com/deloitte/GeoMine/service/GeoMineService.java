@@ -37,7 +37,7 @@ public class GeoMineService {
         mina.setNome(minaAtualizada.getNome());
         mina.setLocalizacao(minaAtualizada.getLocalizacao());
         mina.setMineral(minaAtualizada.getMineral());
-        mina.setStatus(minaAtualizada.getStatus());
+        mina.setAtiva(minaAtualizada.isAtiva());
 
         return repository.save(mina);
     }
