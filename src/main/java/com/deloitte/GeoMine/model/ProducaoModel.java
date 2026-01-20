@@ -1,10 +1,9 @@
 package com.deloitte.GeoMine.model;
 
-
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-
 import java.time.LocalDate;
 
 @Entity
@@ -25,21 +24,27 @@ public class ProducaoModel {
     @NotNull
     private String unidadeMedida;
 
+    @NotNull
+    private Double valorTotal; // Nova coluna adicionada
+
     @ManyToOne
     @JoinColumn(name = "geo_mine_id")
+    @JsonBackReference
     private GeoMineModel geoMineModel;
 
+    public ProducaoModel() {}
 
-    public ProducaoModel() {
-
-    }
-    public ProducaoModel(LocalDate data, Double quantidade, String unidadeMedida, GeoMineModel geoMineModel) {
+    public ProducaoModel(LocalDate data, Double quantidade, String unidadeMedida, Double valorTotal, GeoMineModel geoMineModel) {
         this.data = data;
         this.quantidade = quantidade;
         this.unidadeMedida = unidadeMedida;
+        this.valorTotal = valorTotal;
         this.geoMineModel = geoMineModel;
     }
 
+    public Long getId() {
+        return id;
+    }
 
     public LocalDate getData() {
         return data;
@@ -53,8 +58,16 @@ public class ProducaoModel {
         return unidadeMedida;
     }
 
+    public Double getValorTotal() {
+        return valorTotal;
+    }
+
     public GeoMineModel getGeoMineModel() {
         return geoMineModel;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setData(LocalDate data) {
@@ -67,6 +80,10 @@ public class ProducaoModel {
 
     public void setUnidadeMedida(String unidadeMedida) {
         this.unidadeMedida = unidadeMedida;
+    }
+
+    public void setValorTotal(Double valorTotal) {
+        this.valorTotal = valorTotal;
     }
 
     public void setGeoMineModel(GeoMineModel geoMineModel) {

@@ -1,13 +1,13 @@
 package com.deloitte.GeoMine.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import com.deloitte.GeoMine.model.ProducaoModel;
-
 import java.util.List;
 
 @Entity
-@Table(name= "geo_mine_model")
+@Table(name = "geo_mine_model")
 public class GeoMineModel {
 
     @Id
@@ -23,14 +23,13 @@ public class GeoMineModel {
     @NotNull
     private String mineral;
 
-
     @OneToMany(mappedBy = "geoMineModel", cascade = CascadeType.ALL)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<ProducaoModel> producoes;
 
     private boolean ativa;
 
-    public GeoMineModel() {
-    }
+    public GeoMineModel() {}
 
     public GeoMineModel(String nome, String localizacao, String mineral, boolean ativa) {
         this.nome = nome;
@@ -65,6 +64,14 @@ public class GeoMineModel {
 
     public void setMineral(String mineral) {
         this.mineral = mineral;
+    }
+
+    public List<ProducaoModel> getProducoes() {
+        return producoes;
+    }
+
+    public void setProducoes(List<ProducaoModel> producoes) {
+        this.producoes = producoes;
     }
 
     public boolean isAtiva() {
