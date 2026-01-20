@@ -1,4 +1,4 @@
-GeoMine:
+Aplicação GeoMine:
 
 Este projeto tem como intuito criar um gerenciador de minas, com relatórios sobre a produção diária ou mensal.
 
