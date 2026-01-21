@@ -1,6 +1,7 @@
 package com.deloitte.GeoMine.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,5 +43,25 @@ public class GeoMineService {
 
     public void deletar(Long id) {
         repository.deleteById(id);
+    }
+
+    public double relatorioValorTotalPorMina(Long id) {
+        Optional<GeoMineModel> mina = repository.findById(id);
+        if (mina.isEmpty()) {
+            return 0.0;
+        }
+        if (mina.get().getProducoes() == null || mina.get().getProducoes().isEmpty()) {
+            return 0.0;
+        }
+
+        double total = 0.0;
+
+        for (var producao : mina.get().getProducoes()) {
+            Double valor = producao.getValorTotal();
+            if (valor != null) {
+                total += valor;
+            }
+        }
+        return total;
     }
 }
