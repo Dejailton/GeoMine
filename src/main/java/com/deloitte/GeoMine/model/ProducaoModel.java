@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import jakarta.persistence.FetchType;
 
 @Entity
 @Table(name = "producao")
@@ -27,8 +30,9 @@ public class ProducaoModel {
     @NotNull
     private Double valorTotal; // Nova coluna adicionada
 
-    @ManyToOne
-    @JoinColumn(name = "geo_mine_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "geo_mine_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonBackReference
     private GeoMineModel geoMineModel;
 

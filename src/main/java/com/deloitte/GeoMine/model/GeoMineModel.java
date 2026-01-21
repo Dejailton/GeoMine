@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
+import java.util.ArrayList;
+import jakarta.persistence.FetchType;
 
 @Entity
 @Table(name = "geo_mine_model")
@@ -23,9 +25,9 @@ public class GeoMineModel {
     @NotNull
     private String mineral;
 
-    @OneToMany(mappedBy = "geoMineModel", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "geoMineModel", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private List<ProducaoModel> producoes;
+    private List<ProducaoModel> producoes = new ArrayList<>();
 
     private boolean ativa;
 

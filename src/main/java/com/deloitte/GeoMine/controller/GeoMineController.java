@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.deloitte.GeoMine.dto.GeoMineDTO;
+import jakarta.validation.Valid;
+
 import com.deloitte.GeoMine.model.GeoMineModel;
 import com.deloitte.GeoMine.service.GeoMineService;
 
@@ -30,13 +33,20 @@ public class GeoMineController {
     }
 
     @PostMapping
-    public GeoMineModel criar(@RequestBody GeoMineModel mina) {
+    public GeoMineModel criar(@Valid @RequestBody GeoMineDTO dto) {
+        GeoMineModel mina = new GeoMineModel(dto.nome(), dto.localizacao(), dto.mineral(), dto.ativa());
         return service.salvar(mina);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GeoMineModel> atualizar(@PathVariable Long id, @RequestBody GeoMineModel mina) {
-        GeoMineModel atualizada = service.atualizar(id, mina);
+    public ResponseEntity<?> atualizar(@PathVariable Long id, @Valid @RequestBody GeoMineDTO dto) {
+        GeoMineModel existente = service.buscarPorId(id);
+        if (existente == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        GeoMineModel paraAtualizar = new GeoMineModel(dto.nome(), dto.localizacao(), dto.mineral(), dto.ativa());
+        GeoMineModel atualizada = service.atualizar(id, paraAtualizar);
         if (atualizada == null) {
             return ResponseEntity.notFound().build();
         }
