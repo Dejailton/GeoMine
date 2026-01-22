@@ -10,7 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.deloitte.GeoMine.model.GeoMineModel;
+import com.deloitte.GeoMine.model.ProducaoModel;
 import com.deloitte.GeoMine.service.GeoMineService;
+import com.deloitte.GeoMine.service.ProducaoService;
 
 @RestController
 @RequestMapping("/mina")
@@ -18,6 +20,9 @@ public class GeoMineController {
 
     @Autowired
     private GeoMineService service;
+
+    @Autowired
+    private ProducaoService producaoService;
 
     @GetMapping
     public List<GeoMineModel> listar() {
@@ -80,5 +85,25 @@ public class GeoMineController {
         double total = service.relatorioValorTotalPorMina(id);
         RelatorioValorDTO dto = new RelatorioValorDTO(mina.getNome(), mina.getLocalizacao(), mina.getMineral(), total);
         return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/{id}/producoes")
+    public ResponseEntity<List<com.deloitte.GeoMine.dto.ProducaoResponseDTO>> producoesPorMina(@PathVariable Long id) {
+        GeoMineModel mina = service.buscarPorId(id);
+        if (mina == null) {
+            return ResponseEntity.notFound().build();
+        }
+        List<ProducaoModel> lista = producaoService.listarPorMina(id);
+        List<com.deloitte.GeoMine.dto.ProducaoResponseDTO> dtoList = lista.stream().map(p ->
+                new com.deloitte.GeoMine.dto.ProducaoResponseDTO(
+                        p.getId(),
+                        p.getData() != null ? p.getData().toString() : null,
+                        p.getQuantidade(),
+                        p.getUnidadeMedida(),
+                        p.getValorTotal(),
+                        p.getGeoMineModel() != null ? p.getGeoMineModel().getId() : null
+                )
+        ).toList();
+        return ResponseEntity.ok(dtoList);
     }
 }

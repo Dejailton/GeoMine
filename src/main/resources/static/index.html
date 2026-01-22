@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>GeoMine - Frontend</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div id="app">
+    <header>
+      <h1>GeoMine</h1>
+    </header>
+    <main class="layout">
+      <aside class="sidebar">
+        <h2>Minas</h2>
+        <ul id="lista-minas"></ul>
+        <div class="sidebar-actions">
+          <button id="nova-mina" class="button">Nova mina</button>
+          <button id="atualizar-minas">Atualizar minas</button>
+        </div>
+        <div id="form-nova-mina" class="conteudo" style="display:none; margin-top:8px;"></div>
+      </aside>
+      <section class="content">
+        <div id="mensagens"></div>
+        <div id="detalhes-mina" class="conteudo">Selecione uma mina na lista à esquerda.</div>
+        <div id="relatorio" class="conteudo" style="display:none;"></div>
+        <div id="producoes" class="conteudo" style="display:none;"></div>
+        <div id="formulario-producao" class="conteudo" style="display:none;"></div>
+      </section>
+    </main>
+  </div>
+  <script src="script.js"></script>
+</body>
+
+</html>
