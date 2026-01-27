@@ -10,7 +10,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import jakarta.persistence.FetchType;
 
 @Entity
-@Table(name = "producao")
+@Table(name = "producao", uniqueConstraints = {@UniqueConstraint(columnNames = {"geo_mine_id", "data"})})
 public class ProducaoModel {
 
     @Id

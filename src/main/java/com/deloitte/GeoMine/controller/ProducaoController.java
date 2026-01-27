@@ -5,6 +5,7 @@ import com.deloitte.GeoMine.dto.ProducaoDTO;
 import com.deloitte.GeoMine.model.GeoMineModel;
 import com.deloitte.GeoMine.model.ProducaoModel;
 import com.deloitte.GeoMine.repository.GeoMineRepository;
+import com.deloitte.GeoMine.repository.ProducaoRepository;
 import com.deloitte.GeoMine.service.ProducaoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ public class ProducaoController {
     @Autowired
     private GeoMineRepository geoMineRepository;
 
+    @Autowired
+    private ProducaoRepository producaoRepository;
+
     @GetMapping
     public List<ProducaoModel> listar() {
         return service.listarTodas();
@@ -44,6 +48,11 @@ public class ProducaoController {
         Optional<GeoMineModel> geoOpt = geoMineRepository.findById(dto.geoMineId());
         if (geoOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("GeoMine not found with id: " + dto.geoMineId());
+        }
+
+        var existsOpt = producaoRepository.findByGeoMineModelIdAndData(dto.geoMineId(), dto.data());
+        if (existsOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Já existe uma produção para esta mina na data informada.");
         }
 
         ProducaoModel producao = new ProducaoModel(
@@ -70,6 +79,11 @@ public class ProducaoController {
         Optional<GeoMineModel> geoOpt = geoMineRepository.findById(dto.geoMineId());
         if (geoOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("GeoMine not found with id: " + dto.geoMineId());
+        }
+
+        var existsOpt = producaoRepository.findByGeoMineModelIdAndData(dto.geoMineId(), dto.data());
+        if (existsOpt.isPresent() && !existsOpt.get().getId().equals(id)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Já existe outra produção para esta mina na data informada.");
         }
 
         ProducaoModel paraAtualizar = new ProducaoModel(
