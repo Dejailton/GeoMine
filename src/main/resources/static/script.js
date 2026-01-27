@@ -36,25 +36,115 @@ const estado = {
   minaSelecionada: null
 };
 
+let _messageTimeout = null;
+let _messageModalInstance = null;
+
 function mostrarMensagem(texto, tipo='info'){
-  const el = document.getElementById('mensagens');
-  el.innerHTML = `<div class="msg ${tipo}">${texto}</div>`;
-  setTimeout(()=>{
-    if (el.firstChild) {
-        el.firstChild.remove();
-        }
-       }, 5000);
+  if (!_messageModalInstance) {
+    const modalEl = document.getElementById('messageModal');
+    _messageModalInstance = new bootstrap.Modal(modalEl, { backdrop: true });
+  }
+
+  const header = document.getElementById('messageModalHeader');
+  const title = document.getElementById('messageModalLabel');
+  const body = document.getElementById('messageModalBody');
+
+  // Reset classes
+  header.className = 'modal-header';
+
+  if (tipo === 'success') {
+    title.textContent = 'Sucesso';
+    header.classList.add('bg-success','text-white');
+  } else if (tipo === 'error') {
+    title.textContent = 'Erro';
+    header.classList.add('bg-danger','text-white');
+  } else {
+    title.textContent = 'Informação';
+    header.classList.add('bg-info','text-white');
+  }
+
+  body.textContent = texto;
+
+  // show modal
+  _messageModalInstance.show();
+
+  // limpa timeout anterior
+  if (_messageTimeout) {
+    clearTimeout(_messageTimeout);
+    _messageTimeout = null;
+  }
+
+  // auto-hide após 5s
+  _messageTimeout = setTimeout(()=>{
+    try{ _messageModalInstance.hide(); }catch(e){}
+    _messageTimeout = null;
+  }, 5000);
 }
 
 function renderizarMinas(){
-  const ul = document.getElementById('lista-minas');
-  ul.innerHTML = '';
+  const container = document.getElementById('lista-minas');
+  container.innerHTML = '';
   estado.minas.forEach(m => {
-    const li = document.createElement('li');
-    li.textContent = `${m.id} - ${m.nome} (${m.mineral})`;
-    li.dataset.id = m.id;
-    li.addEventListener('click', () => selecionarMina(m.id));
-    ul.appendChild(li);
+    const item = document.createElement('div');
+    item.className = 'list-group-item d-flex justify-content-between align-items-center';
+    item.dataset.id = m.id;
+
+    const mainText = document.createElement('div');
+    mainText.className = 'mina-item-text';
+    mainText.textContent = `${m.id} - ${m.nome} (${m.mineral})`;
+    mainText.style.cursor = 'pointer';
+    mainText.addEventListener('click', () => selecionarMina(m.id));
+
+    const actions = document.createElement('div');
+    actions.className = 'd-flex flex-column justify-content-center align-items-end gap-2';
+    actions.style.minWidth = '110px';
+
+    const updBtn = document.createElement('button');
+    updBtn.className = 'btn btn-sm btn-outline-primary mb-2';
+    updBtn.textContent = 'Atualizar';
+    updBtn.addEventListener('click', async (ev) => {
+      ev.stopPropagation();
+      try{
+        const minaDados = await api.buscarMina(m.id);
+        renderizarFormularioMina(minaDados);
+      }catch(err){
+        console.error(err);
+        mostrarMensagem('Erro ao carregar dados da mina: '+(err.message||err.statusText),'error');
+      }
+    });
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn btn-sm btn-danger';
+    delBtn.textContent = 'Deletar';
+    delBtn.addEventListener('click', async (ev)=>{
+      ev.stopPropagation();
+      if (!confirm(`Deseja realmente deletar a mina "${m.nome}" (id=${m.id})?`)) return;
+      try{
+        const res = await fetch(`/mina/${m.id}`, { method: 'DELETE' });
+        if (!res.ok){
+          const txt = await res.text(); throw new Error(txt || res.statusText);
+        }
+        // remover do estado e re-renderizar
+        estado.minas = estado.minas.filter(x => x.id !== m.id);
+        if (estado.minaSelecionada && estado.minaSelecionada.id === m.id) {
+          estado.minaSelecionada = null;
+          document.getElementById('detalhes-mina').textContent = 'Selecione uma mina na lista à esquerda.';
+          document.getElementById('producoes').style.display = 'none';
+        }
+        renderizarMinas();
+        mostrarMensagem('Mina deletada com sucesso', 'success');
+      }catch(err){
+        console.error(err);
+        mostrarMensagem('Erro ao deletar mina: '+(err.message||err.statusText), 'error');
+      }
+    });
+
+    actions.appendChild(updBtn);
+    actions.appendChild(delBtn);
+
+    item.appendChild(mainText);
+    item.appendChild(actions);
+    container.appendChild(item);
   });
 }
 
@@ -88,7 +178,7 @@ function renderizarDetalhesMina(){
       const dto = await api.relatorioMina(m.id);
       const r = document.getElementById('relatorio');
       r.style.display = 'block';
-      r.innerHTML = `<h4>Relatório de Valor</h4>
+      r.innerHTML = `<h4>Produção total da mina:</h4>
         <p><strong>Mina:</strong> ${dto.nome}</p>
         <p><strong>Localização:</strong> ${dto.localizacao}</p>
         <p><strong>Mineral:</strong> ${dto.mineral}</p>
@@ -100,9 +190,11 @@ function renderizarDetalhesMina(){
   });
 
   document.getElementById('btn-mostrar-form').addEventListener('click', ()=>{
+    document.getElementById('relatorio').style.display = 'none';
     renderizarFormularioProducao();
     document.getElementById('formulario-producao').style.display = 'block';
   });
+
 }
 
 function renderizarProducoes(){
@@ -121,7 +213,8 @@ function renderizarProducoes(){
       quantidade: p.quantidade,
       unidadeMedida: p.unidadeMedida,
       valorTotal: p.valorTotal,
-      geoMineId: geoId
+      geoMineId: geoId,
+      raw: p
     };
   });
   const filtradas = normalizadas.filter(p => p.geoMineId === null || p.geoMineId === mineId);
@@ -132,32 +225,83 @@ function renderizarProducoes(){
     return;
     }
 
-  let html = `\n    <h4>\n        Produções\n    </h4>\n    <table class="tabela">\n        <thead>\n            <tr>\n                <th>ID</th>\n                <th>Data</th>\n                <th>Quantidade</th>\n                <th>Unidade</th>\n                <th>Valor Total</th>\n            </tr>\n        </thead>\n        <tbody>`;
+  let html = `\n    <h4>\n        Produções\n    </h4>\n    <table class="tabela table">\n        <thead>\n            <tr>\n                <th>ID</th>\n                <th>Data</th>\n                <th>Quantidade</th>\n                <th>Unidade</th>\n                <th>Valor Total</th>\n                <th>Ações</th>\n            </tr>\n        </thead>\n        <tbody>`;
 
   filtradas.forEach(p => {
     const dataText = p.data ? p.data : '';
     const valorText = (p.valorTotal === null || p.valorTotal === undefined) ? '—' : `R$ ${Number(p.valorTotal).toFixed(2)}`;
-    html += `\n    <tr>\n        <td>${p.id}</td>\n        <td>${dataText}</td>\n        <td>${p.quantidade}</td>\n        <td>${p.unidadeMedida}</td>\n        <td>${valorText}</td>\n    </tr>`;
+    html += `\n
+        <tr data-id="${p.id}">\n
+            <td>${p.id}</td>\n
+            <td>${dataText}</td>\n
+            <td>${p.quantidade}</td>\n
+            <td>${p.unidadeMedida}</td>\n
+            <td>${valorText}</td>\n
+            <td class="producoes-acoes"></td>\n
+        </tr>`;
   });
   html += '</tbody></table>';
   container.innerHTML = html;
+
+  filtradas.forEach(p => {
+    const row = container.querySelector(`tr[data-id='${p.id}']`);
+    const actionsTd = row.querySelector('.producoes-acoes');
+
+    const upd = document.createElement('button');
+    upd.className = 'btn btn-sm btn-outline-primary me-2';
+    upd.textContent = 'Atualizar';
+    upd.addEventListener('click', async ()=>{
+      renderizarFormularioProducao(p.raw);
+      document.getElementById('formulario-producao').style.display = 'block';
+    });
+
+    const del = document.createElement('button');
+    del.className = 'btn btn-sm btn-danger';
+    del.textContent = 'Deletar';
+    del.addEventListener('click', async ()=>{
+      if (!confirm(`Deseja remover a produção id=${p.id}?`)) return;
+      try{
+        const res = await fetch(`/producoes/${p.id}`, { method: 'DELETE' });
+        if (!res.ok){
+          const txt = await res.text(); throw new Error(txt || res.statusText);
+        }
+        // remove from estado.producoes
+        estado.producoes = (estado.producoes || []).filter(x => x.id !== p.id);
+        renderizarProducoes();
+        mostrarMensagem('Produção removida', 'success');
+      }catch(err){
+        console.error(err);
+        mostrarMensagem('Erro ao remover produção: '+(err.message||err.statusText), 'error');
+      }
+    });
+
+    actionsTd.appendChild(upd);
+    actionsTd.appendChild(del);
+  });
 }
 
-function renderizarFormularioProducao(){
+function renderizarFormularioProducao(producao){
   const container = document.getElementById('formulario-producao');
-  if (!estado.minaSelecionada) {
-  return;
+  if (!estado.minaSelecionada && !producao) {
+    return;
   }
+  const isEdit = !!producao;
+  const titulo = isEdit ? `Editar Produção #${producao.id}` : `Adicionar Produção para ${estado.minaSelecionada?.nome ?? ''}`;
+  const dataVal = isEdit ? (producao.data ?? '') : '';
+  const quantidadeVal = isEdit ? (producao.quantidade ?? '') : '';
+  const unidadeVal = isEdit ? (producao.unidadeMedida ?? '') : '';
+  const valorVal = isEdit ? (producao.valorTotal ?? '') : '';
+
   container.innerHTML = `
-    <h4>Adicionar Produção para ${estado.minaSelecionada.nome}</h4>
+    <h4>${titulo}</h4>
     <form id="form-prod">
-      <label>Data: <input type="date" name="data" required></label>
-      <label>Quantidade: <input type="number" name="quantidade" min="0.01" step="0.01" required></label>
-      <label>Unidade de Medida: <input type="text" name="unidadeMedida" required></label>
-      <label>Valor Total (R$): <input type="number" name="valorTotal" min="0" step="0.01" required></label>
+      <label>Data: <input type="date" name="data" value="${dataVal}" required></label>
+      <label>Quantidade: <input type="number" name="quantidade" min="0.01" step="0.01" value="${quantidadeVal}" required></label>
+      <label>Unidade de Medida: <input type="text" name="unidadeMedida" value="${unidadeVal}" required></label>
+      <label>Valor Total (R$): <input type="number" name="valorTotal" min="0" step="0.01" value="${valorVal}" required></label>
       <div class="acoes-form">
-        <button type="submit">Salvar</button>
-        <button type="button" id="cancelar-prod">Cancelar</button>
+        <button type="submit" class="btn btn-primary btn-sm">${isEdit ? 'Atualizar' : 'Salvar'}</button>
+        <button type="button" id="cancelar-prod" class="btn btn-secondary btn-sm">Cancelar</button>
       </div>
     </form>
   `;
@@ -171,21 +315,37 @@ function renderizarFormularioProducao(){
       quantidade: Number(fd.get('quantidade')),
       unidadeMedida: fd.get('unidadeMedida'),
       valorTotal: Number(fd.get('valorTotal')),
-      geoMineId: estado.minaSelecionada.id
+      geoMineId: estado.minaSelecionada ? estado.minaSelecionada.id : (producao ? (producao.geoMineModel?.id ?? producao.geoMineId) : null)
     };
     if (!body.data || !body.unidadeMedida || body.quantidade <= 0 || body.valorTotal < 0){
       mostrarMensagem('Dados inválidos. Verifique os campos.', 'error');
       return;
     }
+
     try{
-      const salvo = await api.criarProducao(body);
-      mostrarMensagem('Produção criada com sucesso', 'success');
-      estado.producoes.push(salvo);
-      renderizarProducoes();
-      document.getElementById('formulario-producao').style.display = 'none';
+      if (isEdit){
+        const res = await fetch(`/producoes/${producao.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        if (!res.ok){
+          const txt = await res.text(); throw new Error(txt || res.statusText);
+        }
+        const atualizado = await res.json();
+        estado.producoes = (estado.producoes || []).map(p => p.id === atualizado.id ? atualizado : p);
+        renderizarProducoes();
+        mostrarMensagem('Produção atualizada', 'success');
+      } else {
+        const res = await fetch('/producoes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        if (!res.ok){
+          const txt = await res.text(); throw new Error(txt || res.statusText);
+        }
+        const salvo = await res.json();
+        estado.producoes.push(salvo);
+        renderizarProducoes();
+        mostrarMensagem('Produção criada com sucesso', 'success');
+      }
+      container.style.display = 'none';
     }catch(err){
       console.error(err);
-      mostrarMensagem('Erro ao criar produção: '+err.message, 'error');
+      mostrarMensagem('Erro ao salvar produção: '+(err.message||err.statusText), 'error');
     }
   });
 
@@ -194,11 +354,12 @@ function renderizarFormularioProducao(){
   });
 }
 
-function renderizarFormularioNovaMina(){
+function renderizarFormularioMina(mina){
   const container = document.getElementById('form-nova-mina');
   container.style.display = 'block';
+  const isEdit = !!mina;
   container.innerHTML = `
-    <h4>Nova Mina</h4>
+    <h4>${isEdit ? 'Atualizar Mina' : 'Nova Mina'}</h4>
     <form id="form-nova-mina-form" class="form-nova-mina">
       <div class="form-field"><label>Nome:<br><input type="text" name="nome" required></label></div>
       <div class="form-field"><label>Localização:<br><input type="text" name="localizacao" required></label></div>
@@ -210,11 +371,20 @@ function renderizarFormularioNovaMina(){
         </select>
       </label>
       <div class="acoes-form">
-        <button type="submit">Criar</button>
-        <button type="button" id="cancelar-nova-mina">Cancelar</button>
+        <button type="submit" class="btn btn-primary btn-sm">${isEdit ? 'Atualizar' : 'Criar'}</button>
+        <button type="button" id="cancelar-nova-mina" class="btn btn-secondary btn-sm">Cancelar</button>
       </div>
     </form>
   `;
+
+  const form = document.getElementById('form-nova-mina-form');
+
+  if (isEdit){
+    form.elements['nome'].value = mina.nome ?? (mina.nome === undefined ? '' : mina.nome);
+    form.elements['localizacao'].value = mina.localizacao ?? '';
+    form.elements['mineral'].value = mina.mineral ?? '';
+    form.elements['ativa'].value = (mina.ativa === true) ? 'true' : 'false';
+  }
 
   form.addEventListener('submit', async (ev)=>{
     ev.preventDefault();
@@ -229,19 +399,33 @@ function renderizarFormularioNovaMina(){
       mostrarMensagem('Preencha todos os campos.', 'error');
       return;
     }
+
     try{
-      const res = await fetch('/mina', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-      if (!res.ok){
-        const txt = await res.text(); throw new Error(txt || res.statusText);
+      if (isEdit){
+        const res = await fetch(`/mina/${mina.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        if (!res.ok){
+          const txt = await res.text(); throw new Error(txt || res.statusText);
+        }
+        const atualizada = await res.json();
+        estado.minas = (estado.minas || []).map(m => m.id === atualizada.id ? atualizada : m);
+        estado.minaSelecionada = atualizada;
+        renderizarMinas();
+        renderizarDetalhesMina();
+        mostrarMensagem('Mina atualizada com sucesso', 'success');
+      } else {
+        const res = await fetch('/mina', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        if (!res.ok){
+          const txt = await res.text(); throw new Error(txt || res.statusText);
+        }
+        const nova = await res.json();
+        estado.minas.push(nova);
+        renderizarMinas();
+        mostrarMensagem('Mina criada com sucesso', 'success');
       }
-      const nova = await res.json();
-      mostrarMensagem('Mina criada com sucesso', 'success');
-      estado.minas.push(nova);
-      renderizarMinas();
       container.style.display = 'none';
     }catch(err){
       console.error(err);
-      mostrarMensagem('Erro ao criar mina: '+err.message, 'error');
+      mostrarMensagem((isEdit ? 'Erro ao atualizar mina: ' : 'Erro ao criar mina: ') + err.message, 'error');
     }
   });
 
@@ -256,7 +440,7 @@ function renderizarFormularioNovaMina(){
     if (btn){
       btn.addEventListener('click', ()=>{
         const container = document.getElementById('form-nova-mina');
-        if (container.style.display === 'block') container.style.display = 'none'; else renderizarFormularioNovaMina();
+        if (container.style.display === 'block') container.style.display = 'none'; else renderizarFormularioMina();
       });
     }
   });

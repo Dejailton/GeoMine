@@ -77,17 +77,15 @@ header {
     margin-top: 8px;
 }
 
-.sidebar-actions button {
+.sidebar-actions .app-btn {
     flex: 1;
     padding: 8px;
     border-radius: 4px;
-    border: 1px solid #e0e6ef;
-    background: #f7f9fc;
     cursor: pointer;
 }
 
-.sidebar-actions button:hover {
-    background: #eef6ff;
+.sidebar-actions .app-btn:hover {
+    background: rgba(0,0,0,0.02);
 }
 form label {
     display: block;
@@ -110,15 +108,13 @@ form input[type="date"] {
     margin-top: 8px;
 }
 
-.acoes-form button {
+.acoes-form .app-btn {
     padding: 6px 10px;
     border-radius: 4px;
-    border: 1px solid #d0d7e6;
-    background: #fff;
     cursor: pointer;
 }
 
-.acoes-form button:hover {
+.acoes-form .app-btn:hover {
     background: #f2f6fb;
 }
 
@@ -155,6 +151,7 @@ form input[type="date"] {
 .form-nova-mina .form-field select {
     width: 100%;
 }
+
 .acoes {
     display: flex;
     gap: 8px;
@@ -163,7 +160,7 @@ form input[type="date"] {
     align-items: center;
 }
 
-.acoes .btn {
+.acoes .app-btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -178,41 +175,6 @@ form input[type="date"] {
     fill: currentColor;
 }
 
-.btn {
-    padding: 6px 10px;
-    border-radius: 4px;
-    border: 1px solid #cfd8e6;
-    background: #fff;
-    cursor: pointer;
-}
-
-.btn:hover {
-    background: #f2f6fb;
-}
-
-.btn-primary {
-    background: #1f6fdc;
-    color: #ffffff;
-    border-color: #195bb0;
-}
-
-.btn-primary:hover {
-    background: #1654a8;
-}
-
-.btn-secondary {
-    background: #f0f4f8;
-    color: #1f2d3d;
-}
-
-.btn-secondary:hover {
-    background: #e6eef8;
-}
-
-.btn:focus-visible {
-    outline: 3px solid rgba(33,113,255,0.25);
-    outline-offset: 2px;
-}
 
 @media (max-width: 800px) {
     .layout {
