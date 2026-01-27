@@ -202,7 +202,7 @@ function renderizarDetalhesMina(){
         <p><strong>Localização:</strong> ${dto.localizacao}</p>
         <p><strong>Mineral:</strong> ${dto.mineral}</p>
         <p><strong>Valor total:</strong> ${formatCurrency(dto.valorTotal)}</p>
-        <p><strong>Quantidade total:</strong> ${dto.quantidadeTotal != null ? Number(dto.quantidadeTotal).toLocaleString('pt-BR') : '0'}</p>`;
+        <p><strong>Quantidade total:</strong> ${dto.quantidadeTotal != null ? Number(dto.quantidadeTotal).toLocaleString('pt-BR') : '0'} ${dto.unidadeQuantidade ?? ''}</p>`;
     }catch(err){
       console.error(err);
       mostrarMensagem('Erro ao buscar relatório: '+err.message, 'error');
@@ -248,13 +248,14 @@ function renderizarProducoes(){
   let html = `\n    <h4>\n        Produções\n    </h4>\n    <table class="tabela table">\n        <thead>\n            <tr>\n                <th>ID</th>\n                <th>Data</th>\n                <th>Quantidade</th>\n                <th>Unidade</th>\n                <th>Valor Total</th>\n                <th>Ações</th>\n            </tr>\n        </thead>\n        <tbody>`;
 
   filtradas.forEach(p => {
-    const dataText = p.data ? p.data : '';
-    const valorText = (p.valorTotal === null || p.valorTotal === undefined) ? '—' : `R$ ${Number(p.valorTotal).toFixed(2)}`;
+    const dataText = p.data ? formatDate(p.data) : '';
+    const quantidadeText = (p.quantidade === null || p.quantidade === undefined) ? '' : Number(p.quantidade).toLocaleString('pt-BR');
+    const valorText = (p.valorTotal === null || p.valorTotal === undefined) ? '—' : formatCurrency(p.valorTotal);
     html += `\n
         <tr data-id="${p.id}">\n
             <td>${p.id}</td>\n
             <td>${dataText}</td>\n
-            <td>${p.quantidade}</td>\n
+            <td>${quantidadeText}</td>\n
             <td>${p.unidadeMedida}</td>\n
             <td>${valorText}</td>\n
             <td class="producoes-acoes"></td>\n
@@ -317,7 +318,13 @@ function renderizarFormularioProducao(producao){
     <form id="form-prod">
       <label>Data: <input type="date" name="data" value="${dataVal}" required></label>
       <label>Quantidade: <input type="number" name="quantidade" min="0.01" step="0.01" value="${quantidadeVal}" required></label>
-      <label>Unidade de Medida: <input type="text" name="unidadeMedida" value="${unidadeVal}" required></label>
+      <label>Unidade de Medida:
+        <select name="unidadeMedida" required>
+          <option value="kg" ${unidadeVal === 'kg' ? 'selected' : ''}>kg (kilograma)</option>
+          <option value="g" ${unidadeVal === 'g' ? 'selected' : ''}>g (grama)</option>
+          <option value="t" ${unidadeVal === 't' ? 'selected' : ''}>t (tonelada)</option>
+        </select>
+      </label>
       <label>Valor Total (R$): <input type="number" name="valorTotal" min="0" step="0.01" value="${valorVal}" required></label>
       <div class="acoes-form">
         <button type="submit" class="btn btn-primary btn-sm">${isEdit ? 'Atualizar' : 'Salvar'}</button>

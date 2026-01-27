@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.deloitte.GeoMine.model.GeoMineModel;
+import com.deloitte.GeoMine.model.ProducaoModel;
+import com.deloitte.GeoMine.model.Unidade;
 import com.deloitte.GeoMine.repository.GeoMineRepository;
 
 @Service
@@ -56,7 +58,7 @@ public class GeoMineService {
 
         double total = 0.0;
 
-        for (var producao : mina.get().getProducoes()) {
+        for (ProducaoModel producao : mina.get().getProducoes()) {
             Double valor = producao.getValorTotal();
             if (valor != null) {
                 total += valor;
@@ -74,13 +76,29 @@ public class GeoMineService {
             return 0.0;
         }
 
-        double totalQuantidade = 0.0;
-        for (var producao : mina.get().getProducoes()) {
+        double totalQuantidadeKg = 0.0;
+        for (ProducaoModel producao : mina.get().getProducoes()) {
             Double qtd = producao.getQuantidade();
-            if (qtd != null) {
-                totalQuantidade += qtd;
+            if (qtd == null) continue;
+            Unidade u = producao.getUnidadeMedida();
+            if (u == null) {
+                totalQuantidadeKg += qtd;
+                continue;
+            }
+            switch (u) {
+                case KG:
+                    totalQuantidadeKg += qtd;
+                    break;
+                case G:
+                    totalQuantidadeKg += qtd / 1000.0;
+                    break;
+                case T:
+                    totalQuantidadeKg += qtd * 1000.0;
+                    break;
+                default:
+                    totalQuantidadeKg += qtd;
             }
         }
-        return totalQuantidade;
+        return totalQuantidadeKg;
     }
 }

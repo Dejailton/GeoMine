@@ -82,8 +82,8 @@ public class GeoMineController {
         }
 
         double total = service.relatorioValorTotalPorMina(id);
-        double quantidadeTotal = service.relatorioQuantidadeTotalPorMina(id);
-        RelatorioValorDTO dto = new RelatorioValorDTO(mina.getNome(), mina.getLocalizacao(), mina.getMineral(), total, quantidadeTotal);
+        double quantidadeTotalKg = service.relatorioQuantidadeTotalPorMina(id);
+        RelatorioValorDTO dto = new RelatorioValorDTO(mina.getNome(), mina.getLocalizacao(), mina.getMineral(), total, quantidadeTotalKg, "kg");
         return ResponseEntity.ok(dto);
     }
 
@@ -99,7 +99,7 @@ public class GeoMineController {
                         p.getId(),
                         p.getData() != null ? p.getData().toString() : null,
                         p.getQuantidade(),
-                        p.getUnidadeMedida(),
+                        p.getUnidadeMedida() != null ? p.getUnidadeMedida().getCodigo() : null,
                         p.getValorTotal(),
                         p.getGeoMineModel() != null ? p.getGeoMineModel().getId() : null
                 )
