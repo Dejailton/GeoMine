@@ -2,6 +2,7 @@ package com.deloitte.GeoMine.controller;
 import java.util.List;
 
 import com.deloitte.GeoMine.dto.GeoMineDTO;
+import com.deloitte.GeoMine.dto.ProducaoResponseDTO;
 import com.deloitte.GeoMine.dto.RelatorioValorDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,14 +89,14 @@ public class GeoMineController {
     }
 
     @GetMapping("/{id}/producoes")
-    public ResponseEntity<List<com.deloitte.GeoMine.dto.ProducaoResponseDTO>> producoesPorMina(@PathVariable Long id) {
+    public ResponseEntity<List<ProducaoResponseDTO>> producoesPorMina(@PathVariable Long id) {
         GeoMineModel mina = service.buscarPorId(id);
         if (mina == null) {
             return ResponseEntity.notFound().build();
         }
         List<ProducaoModel> lista = producaoService.listarPorMina(id);
-        List<com.deloitte.GeoMine.dto.ProducaoResponseDTO> dtoList = lista.stream().map(p ->
-                new com.deloitte.GeoMine.dto.ProducaoResponseDTO(
+        List<ProducaoResponseDTO> dtoList = lista.stream().map(p ->
+                new ProducaoResponseDTO(
                         p.getId(),
                         p.getData() != null ? p.getData().toString() : null,
                         p.getQuantidade(),

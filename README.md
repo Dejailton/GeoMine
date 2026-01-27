@@ -109,3 +109,6 @@ Troubleshooting comum
 - Erro de conexão com DB: verifique se o PostgreSQL está ativo, se as variáveis de ambiente estão corretas e se o usuário tem permissões.
 - Porta 5000 em uso: altere `server.port` ou pare o processo que está usando a porta.
 
+---
+
+© 2026 Dejailton da Silva. Todos os direitos reservados.
