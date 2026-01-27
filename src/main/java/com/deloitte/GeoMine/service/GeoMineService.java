@@ -64,4 +64,23 @@ public class GeoMineService {
         }
         return total;
     }
+
+    public double relatorioQuantidadeTotalPorMina(Long id) {
+        Optional<GeoMineModel> mina = repository.findById(id);
+        if (mina.isEmpty()) {
+            return 0.0;
+        }
+        if (mina.get().getProducoes() == null || mina.get().getProducoes().isEmpty()) {
+            return 0.0;
+        }
+
+        double totalQuantidade = 0.0;
+        for (var producao : mina.get().getProducoes()) {
+            Double qtd = producao.getQuantidade();
+            if (qtd != null) {
+                totalQuantidade += qtd;
+            }
+        }
+        return totalQuantidade;
+    }
 }

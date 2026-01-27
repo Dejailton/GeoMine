@@ -1,5 +1,4 @@
 package com.deloitte.GeoMine.controller;
-import java.math.BigDecimal;
 import java.util.List;
 
 import com.deloitte.GeoMine.dto.GeoMineDTO;
@@ -83,7 +82,8 @@ public class GeoMineController {
         }
 
         double total = service.relatorioValorTotalPorMina(id);
-        RelatorioValorDTO dto = new RelatorioValorDTO(mina.getNome(), mina.getLocalizacao(), mina.getMineral(), total);
+        double quantidadeTotal = service.relatorioQuantidadeTotalPorMina(id);
+        RelatorioValorDTO dto = new RelatorioValorDTO(mina.getNome(), mina.getLocalizacao(), mina.getMineral(), total, quantidadeTotal);
         return ResponseEntity.ok(dto);
     }
 

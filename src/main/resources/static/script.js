@@ -1,3 +1,22 @@
+if (typeof window.formatDate !== 'function') {
+  window.formatDate = function(dateStr){
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (!isNaN(d.getTime())) return d.toLocaleDateString('pt-BR');
+    const m = String(dateStr).match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (m) return `${m[3]}/${m[2]}/${m[1]}`;
+    return String(dateStr);
+  };
+}
+if (typeof window.formatCurrency !== 'function') {
+  window.formatCurrency = function(value){
+    if (value === null || value === undefined || value === '') return '—';
+    const num = Number(value);
+    if (Number.isNaN(num)) return String(value);
+    return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  };
+}
+
 const api = {
   listarMinas: () => fetch('/mina').then(r => r.json()),
   buscarMina: (id) => fetch(`/mina/${id}`).then(async r => {
@@ -182,7 +201,8 @@ function renderizarDetalhesMina(){
         <p><strong>Mina:</strong> ${dto.nome}</p>
         <p><strong>Localização:</strong> ${dto.localizacao}</p>
         <p><strong>Mineral:</strong> ${dto.mineral}</p>
-        <p><strong>Valor total:</strong> R$ ${Number(dto.valorTotal).toFixed(2)}</p>`;
+        <p><strong>Valor total:</strong> ${formatCurrency(dto.valorTotal)}</p>
+        <p><strong>Quantidade total:</strong> ${dto.quantidadeTotal != null ? Number(dto.quantidadeTotal).toLocaleString('pt-BR') : '0'}</p>`;
     }catch(err){
       console.error(err);
       mostrarMensagem('Erro ao buscar relatório: '+err.message, 'error');

@@ -1,15 +1,76 @@
+:root {
+    --vale-dark: #054a43;
+    --vale-primary: #0a8b6a;
+    --vale-accent: #f2b705;
+    --vale-muted: #6b7a76;
+    --bg: #f6f8f7;
+    --card-bg: #ffffff;
+    --text: #043733;
+    --danger: #c82333;
+}
+
 /* Geral */
 body {
     font-family: Arial, Helvetica, sans-serif;
     margin: 0;
-    background: #f5f7fa;
-    color: #222;
+    background: var(--bg);
+    color: var(--text);
 }
 
 header {
-    background: #2c3e50;
+    background: var(--vale-dark);
     color: #fff;
     padding: 12px 20px;
+}
+
+header.bg-dark {
+    background: var(--vale-dark) !important;
+    color: #fff !important;
+}
+
+header .container-fluid {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+header h1 {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin: 0;
+    font-size: 28px;
+    color: #ffffff;
+}
+
+header::after {
+    content: '';
+    display: block;
+    height: 6px;
+    background: linear-gradient(90deg, var(--vale-primary) 0%, var(--vale-accent) 100%);
+}
+
+.btn-primary {
+    background-color: var(--vale-primary) !important;
+    border-color: var(--vale-primary) !important;
+    color: #fff !important;
+}
+.btn-primary:hover, .btn-primary:focus {
+    background-color: #076f55 !important;
+    border-color: #076f55 !important;
+}
+
+.btn-secondary {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+    color: #fff !important;
+}
+
+.btn-outline-primary {
+    color: var(--vale-primary) !important;
+    border-color: var(--vale-primary) !important;
+}
+.btn-outline-primary:hover {
+    background-color: rgba(10,139,106,0.08) !important;
 }
 
 /* Layout */
@@ -21,7 +82,7 @@ header {
 
 .sidebar {
     width: 300px;
-    background: #fff;
+    background: var(--card-bg);
     padding: 12px;
     border-radius: 6px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
@@ -34,7 +95,7 @@ header {
 /* Cartões / containers */
 .conteudo,
 .cartao {
-    background: #fff;
+    background: var(--card-bg);
     padding: 12px;
     margin-bottom: 12px;
     border-radius: 6px;
@@ -55,7 +116,7 @@ header {
 }
 
 #lista-minas li:hover {
-    background: #f0f6fb;
+    background: #eef7f4;
 }
 
 /* Tabelas */
@@ -125,18 +186,18 @@ form input[type="date"] {
 }
 
 .msg.info {
-    background: #e7f3ff;
-    color: #3178c6;
+    background: #e8f6f4;
+    color: var(--vale-dark);
 }
 
 .msg.success {
     background: #e6ffed;
-    color: #2b7a3a;
+    color: #0b7a4f;
 }
 
 .msg.error {
     background: #ffe6e6;
-    color: #b32b2b;
+    color: var(--danger);
 }
 
 .form-nova-mina {
@@ -175,6 +236,7 @@ form input[type="date"] {
     fill: currentColor;
 }
 
+header h1 { font-weight: 600; letter-spacing: 0.5px; }
 
 @media (max-width: 800px) {
     .layout {
