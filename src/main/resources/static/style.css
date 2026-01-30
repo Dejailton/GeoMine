@@ -1,0 +1,249 @@
+:root {
+    --vale-dark: #054a43;
+    --vale-primary: #0a8b6a;
+    --vale-accent: #f2b705;
+    --vale-muted: #6b7a76;
+    --bg: #f6f8f7;
+    --card-bg: #ffffff;
+    --text: #043733;
+    --danger: #c82333;
+}
+
+/* Geral */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+}
+
+header {
+    background: var(--vale-dark);
+    color: #fff;
+    padding: 12px 20px;
+}
+
+header.bg-dark {
+    background: var(--vale-dark) !important;
+    color: #fff !important;
+}
+
+header .container-fluid {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+header h1 {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin: 0;
+    font-size: 28px;
+    color: #ffffff;
+}
+
+header::after {
+    content: '';
+    display: block;
+    height: 6px;
+    background: linear-gradient(90deg, var(--vale-primary) 0%, var(--vale-accent) 100%);
+}
+
+.btn-primary {
+    background-color: var(--vale-primary) !important;
+    border-color: var(--vale-primary) !important;
+    color: #fff !important;
+}
+.btn-primary:hover, .btn-primary:focus {
+    background-color: #076f55 !important;
+    border-color: #076f55 !important;
+}
+
+.btn-secondary {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+    color: #fff !important;
+}
+
+.btn-outline-primary {
+    color: var(--vale-primary) !important;
+    border-color: var(--vale-primary) !important;
+}
+.btn-outline-primary:hover {
+    background-color: rgba(10,139,106,0.08) !important;
+}
+
+/* Layout */
+.layout {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+}
+
+.sidebar {
+    width: 300px;
+    background: var(--card-bg);
+    padding: 12px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.content {
+    flex: 1;
+}
+
+/* Cartões / containers */
+.conteudo,
+.cartao {
+    background: var(--card-bg);
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+/* Lista de minas */
+#lista-minas {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#lista-minas li {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+#lista-minas li:hover {
+    background: #eef7f4;
+}
+
+/* Tabelas */
+.tabela {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabela th,
+.tabela td {
+    padding: 8px;
+    border: 1px solid #e6eef7;
+}
+
+/* Sidebar actions (botões Nova/Atualizar) */
+.sidebar-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.sidebar-actions .app-btn {
+    flex: 1;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.sidebar-actions .app-btn:hover {
+    background: rgba(0,0,0,0.02);
+}
+form label {
+    display: block;
+    margin: 6px 0;
+}
+
+form input[type="text"],
+form select,
+form input[type="number"],
+form input[type="date"] {
+    width: 100%;
+    padding: 6px;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.acoes-form {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.acoes-form .app-btn {
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.acoes-form .app-btn:hover {
+    background: #f2f6fb;
+}
+
+.msg {
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.msg.info {
+    background: #e8f6f4;
+    color: var(--vale-dark);
+}
+
+.msg.success {
+    background: #e6ffed;
+    color: #0b7a4f;
+}
+
+.msg.error {
+    background: #ffe6e6;
+    color: var(--danger);
+}
+
+.form-nova-mina {
+    padding: 6px;
+}
+
+.form-nova-mina .form-field {
+    margin-bottom: 8px;
+}
+
+.form-nova-mina .form-field input,
+.form-nova-mina .form-field select {
+    width: 100%;
+}
+
+.acoes {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.acoes .app-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    font-size: 14px;
+}
+
+.acoes .icon {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    fill: currentColor;
+}
+
+header h1 { font-weight: 600; letter-spacing: 0.5px; }
+
+@media (max-width: 800px) {
+    .layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+    }
+}

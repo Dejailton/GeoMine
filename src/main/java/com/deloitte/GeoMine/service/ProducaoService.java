@@ -18,6 +18,10 @@ public class ProducaoService {
         return repository.findAll();
     }
 
+    public List<ProducaoModel> listarPorMina(Long geoMineId) {
+        return repository.findByGeoMineModelId(geoMineId);
+    }
+
     public ProducaoModel buscarPorId(Long id) {
         return repository.findById(id).orElse(null);
     }
