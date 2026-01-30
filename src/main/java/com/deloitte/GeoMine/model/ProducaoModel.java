@@ -10,7 +10,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import jakarta.persistence.FetchType;
 
 @Entity
-@Table(name = "producao")
+@Table(name = "producao", uniqueConstraints = {@UniqueConstraint(columnNames = {"geo_mine_id", "data"})})
 public class ProducaoModel {
 
     @Id
@@ -25,7 +25,8 @@ public class ProducaoModel {
     private Double quantidade;
 
     @NotNull
-    private String unidadeMedida;
+    @Enumerated(EnumType.STRING)
+    private Unidade unidadeMedida;
 
     @NotNull
     private Double valorTotal; // Nova coluna adicionada
@@ -38,7 +39,7 @@ public class ProducaoModel {
 
     public ProducaoModel() {}
 
-    public ProducaoModel(LocalDate data, Double quantidade, String unidadeMedida, Double valorTotal, GeoMineModel geoMineModel) {
+    public ProducaoModel(LocalDate data, Double quantidade, Unidade unidadeMedida, Double valorTotal, GeoMineModel geoMineModel) {
         this.data = data;
         this.quantidade = quantidade;
         this.unidadeMedida = unidadeMedida;
@@ -58,7 +59,7 @@ public class ProducaoModel {
         return quantidade;
     }
 
-    public String getUnidadeMedida() {
+    public Unidade getUnidadeMedida() {
         return unidadeMedida;
     }
 
@@ -82,7 +83,7 @@ public class ProducaoModel {
         this.quantidade = quantidade;
     }
 
-    public void setUnidadeMedida(String unidadeMedida) {
+    public void setUnidadeMedida(Unidade unidadeMedida) {
         this.unidadeMedida = unidadeMedida;
     }
 
